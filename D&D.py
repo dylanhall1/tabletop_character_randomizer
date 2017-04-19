@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 '''
 This character generator is based purely off the free
 information found from the D&D 5e basic players guide at
@@ -69,12 +70,12 @@ class Character(object):
         language = ""
         if race == 'Dwarf':
             absc = "Your Constitution score increases by 2."
-            age = "Dwarves mature at the same rate as humans, but they're considered young until they reach the age of 50. On average, they live about 350 years."
+            age = "Dwarves mature at the same rate as humans, but they're considered young until they reach the age of 50.\n\t On average, they live about 350 years."
             size = "Dwarves stand between 4 and 5 feet tall and average about 150 pounds. Your size is Medium."
             speed = "Your base walking speed is 25 feet. Your speed is not reduced by wearing heavy armor."
             language = "You can speak, read, and write Common and Dwarvish."
             special = ""
-            return absc, age, size, speed, language
+            return absc, age, size, speed, language, special
         elif race == 'Elf':
             absc = "Your Dexterity score increases by 2."
             age = "An Elf typically claims adulthood and an adult name around the age of 100 and can live to be 750 years old."
@@ -82,7 +83,7 @@ class Character(object):
             speed = "Your base walking speed is 30 feet."
             language = "You can speak, read, and write Common and Elvish."
             special = ""
-            return absc, age, size, speed, language
+            return absc, age, size, speed, language, special
         elif race == 'Halfling':
             absc = "Your Dexterity score increases by 2."
             age = "A halfling reaches adulthood at the age of 20 and generally lives into the middle of his or her second century"
@@ -90,7 +91,7 @@ class Character(object):
             speed = "Your base walking speed is 25 feet."
             language = "You can speak, read, and write Common and Halfling"
             special = ""
-            return absc, age, size, speed, language
+            return absc, age, size, speed, language, special
         elif race == 'Human':
             absc = "Your ability scores each increase by 1."
             age = "Humans reach adulthood in their late teens and live less than a century."
@@ -98,7 +99,7 @@ class Character(object):
             speed = "Your base walking speed is 30 feet."
             language = "You can speak, read and write Common and One extra language of your choosing. "
             special = ""
-            return absc, age, size, speed, language
+            return absc, age, size, speed, language, special
         else:
             return "What?"
 
@@ -111,20 +112,32 @@ class Character(object):
         exit(1)
 
 def character_info(character):
-    print "\nYour class is {} and your race is {}\n".format(character.characterrace, character.characterclass)
-    print '''roll 4 D6s drop the lowest number and add the highest 3 for your value.
-This has been done 6 times, one for each stat. They are as follows:
-{} {} {} {} {} {}
-    '''.format(character.stats[0],character.stats[1],character.stats[2],character.stats[3],character.stats[4],character.stats[5])
-    print "You can allocate these numbers into the following stats:\nWisdom, Constitution, Dexterity, Strength, Charisma, and Intelligence."
-    print '''\nCharacter Information:
+    #all my newlines and tabs are because I like the command line more neat, in reality it doesnt matter.
+    stat_name = ['Strength','Wisdom','Intelligence','Constitution','Dexterity','Charisma']
+    player_stats = list(character.char_stats())
+    FINAL_STATS = []
+    print "\n\tYour class is {} and your race is {}\n".format(character.characterrace, character.characterclass)
+    print "Please choose one of the following for your stat: {}".format(player_stats)
+    for stat_num in range(len(player_stats)):
+        while True:
+            user = raw_input("Please input one of these stats for your " + stat_name[stat_num] + ": ")
+            if user.isdigit(): #cant use isnumeric because of unicode?
+                stat_choice = int(user)
+                if stat_choice in player_stats:
+                    FINAL_STATS.append(str(stat_name[stat_num]) + ": " + str(stat_choice) )
+                    break
+        player_stats[stat_num] = stat_choice
+    print "\n\tSUMMARY"
+    print "\n\tYour class is {} and your race is {}\n".format(character.characterrace, character.characterclass)
+    print "\tYour final stats are as follows:\n{} {} {} {} {} {}".format(FINAL_STATS[0],FINAL_STATS[1],FINAL_STATS[2],FINAL_STATS[3],FINAL_STATS[4],FINAL_STATS[5])
+    print '''
+\tCharacter Information:\n
 Ability Score: {}
-Age: {}
+Language: {}
 Size: {}
 Speed: {}
-Language: {}
-    '''.format(character.traits[0],character.traits[1],character.traits[2],character.traits[3], character.traits[4])
-
+Age: {}
+    '''.format(character.traits[0],character.traits[1],character.traits[2],character.traits[3], character.traits[4])#its ordered like this to look nice on the command line
 #character testing
 char1 = Character()
 character_info(char1)

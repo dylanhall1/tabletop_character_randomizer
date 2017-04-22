@@ -12,7 +12,6 @@ Author:  Dylan Hall
 from random import *
 
 class Character(object):
-
     def __init__(self):
         #runs the class, race, and stat generators
         self.characterclass = self.char_class()
@@ -21,6 +20,7 @@ class Character(object):
         self.traits = self.char_traits()
         self.spells = self.char_spells()
         self.character_info()
+
 
     def char_class(self):
         return choice(['Cleric','Fighter','Rogue','Wizard'])
@@ -100,11 +100,8 @@ class Character(object):
             return "What?"
 
     def char_spells(self):
-        if self.characterclass == 'Cleric' or self.characterclass == 'Wizard':
-            num0 = 3
-            num1 = 2
-        else:
-            break
+        num0 = 3
+        num1 = 2
         cantrip_spells = []
         level_1_spells = []
         cantrips = ['Acid Splash',
@@ -156,12 +153,21 @@ class Character(object):
 
         return cantrip_spells, level_1_spells
 
-    def char_items(self, charclass):
-        #may do this at some point
-        exit(1)
+    def print_spells(self):
+        #spells looks like this ([cantrip1,cantrip2],[spell1,spell2])
+        #using 2 for loops for desired spelllist output
+        spells = self.spells
+        print "\tCantrips:"
+        for x in spells[0]:
+            print "\t\t" + x
+        print "\tLevel 1:"
+        for y in spells[1]:
+            print "\t\t" + y
+
+    def char_items(self):
+        pass
 
     def character_info(self):
-        #all my newlines and tabs are because I like the command line more neat, in reality it doesnt matter.
         stat_name = ['Strength','Wisdom','Intelligence','Constitution','Dexterity','Charisma']
         FINAL_STATS = []
         print "\n\tYour race is {} and your class is {}\n".format(self.characterrace,self.characterclass )
@@ -187,7 +193,8 @@ class Character(object):
     Age: {}
     {}
      '''.format(self.traits[0], self.traits[1], self.traits[2], self.traits[3], self.traits[4], self.traits[5])
-
+        if self.characterclass == 'Cleric' or self.characterclass == 'Wizard':
+            self.print_spells()
         print "\t\t\tYour final stats are as follows:\n\t{} {} {} {} {} {}".format(FINAL_STATS[0],FINAL_STATS[1],FINAL_STATS[2],FINAL_STATS[3],FINAL_STATS[4],FINAL_STATS[5])
 
 #character testing

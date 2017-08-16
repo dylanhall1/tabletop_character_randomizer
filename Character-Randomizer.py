@@ -7,6 +7,8 @@ http://dnd.wizards.com/products/tabletop/players-basic-rules
 This is to create a basic character giving you a race, class,
 traits, spells, and items for your character.
 
+I used Py2Exe to make a runnable .exe file
+
 Author:  Dylan Hall
 '''
 from random import *
@@ -16,37 +18,69 @@ class Character(object):
         #runs the class, race, and stat generators
         self.characterclass = self.char_class()
         self.characterrace = self.char_race()
+        self.intro_summary()
         self.stats = self.char_stats()
         self.traits = self.char_traits()
-        self.spells = self.char_spells()
-        self.character_info()
+        self.items = self.char_items()
+        self.character_summary()
 
 
     def char_class(self):
-        return choice(['Cleric','Fighter','Rogue','Wizard'])
+        return choice(['Cleric', 'Fighter', 'Rogue', 'Wizard'])
 
     def char_race(self):
-        return choice(['Hill Dwarf','Mountain Dwarf','High Elf','Wood Elf','Lightfoot Halfling','Stout Halfling','Human'])
+        return choice(['Hill Dwarf', 'Mountain Dwarf', 'High Elf', 'Wood Elf',
+                       'Lightfoot Halfling', 'Stout Halfling','Human'])
+
+    def intro_summary(self):
+        print'''
+        Your Randomized Race and Class is as Follows:
+        Race:  {}
+        Class: {}
+        '''.format(self.characterrace,self.characterclass)
 
     def char_stats(self):
         # roll 4 D6s drop the lowest number and add the highest 3
         # this is done for each stat slot
+        character_stats = {
+            'Strength': 0,
+            'Wisdom': 0,
+            'Intelligence': 0,
+            'Constitution': 0,
+            'Dexterity': 0,
+            'Charisma': 0
+        }
+
         stats = []
         for x in range(6):
-            rolls =[randint(1,6) for i in range(4)]
+            rolls = [randint(1, 6) for i in range(4)]
             rolls.sort()
             stats.append(sum(rolls[1:]))
-        return stats
 
-    """this is a long list of traits for each race which will be said in the output of the character"""
+        for i in character_stats:
+            while True:
+                input = raw_input("What stat would you like to be for {}\nYour stats to choose from are {}\n".format(i, stats))
+                if input.isdigit():
+                    input = int(input)
+                    if input in stats:
+                        character_stats[i] = input
+                        stats.remove(input)
+                        break
+        return character_stats
+
+
     def char_traits(self):
+    # character traits for each race to be used in the output of the character and adds to their stats
         race = self.characterrace
         #Dwarf
         if race == 'Hill Dwarf' or race == 'Mountain Dwarf':
+            self.stats['Constitution'] += 2
             if race == 'Hill Dwarf':
-                absc = "Your Constitution score increases by 2 and your Wisdom score increased by 1."
+                self.stats['Wisdom'] +- 1
+                modifystats = "Hill Dwarves are Sturdy and receive an additional +2 Constitition and +1 Wisdom ability scores."
             else:
-                absc = "Your Constitution score increases by 2 and your Strength score increased by 2."
+                self.stats['Strength'] += 2
+                modifystats = "Mountain Dwarves are Strong and receive an addition +2 Constitution and +2 Strength ability scores. "
             age = "Dwarves mature at the same rate as humans, but they're considered young until they reach the age of 50.\n\t On average, they live about 350 years."
             size = "Dwarves stand between 4 and 5 feet tall and average about 150 pounds. Your size is Medium."
             speed = "Your base walking speed is 25 feet. Your speed is not reduced by wearing heavy armor."
@@ -55,13 +89,16 @@ class Character(object):
                 special = "Dwarven Toughness: Your hit point maximum increased by 1, and increased by 1 everytime you gain a level"
             else:
                 special = "Dwarven Armor Training: You have proficiency with light and medium armor."
-            return absc, age, size, speed, language, special
+            return modifystats, age, size, speed, language, special
         #Elf
         elif race == 'High Elf' or race == 'Wood Elf':
+            self.stats['Dexterity'] += 2
             if race == 'High Elf':
-                absc = "Your Dexterity score increases by 2 and your Intelligence score increases by 1."
+                self.stats['Intelligence'] += 1
+                modifystats = "High Elves are lithe and intelligent and receive an additional +2 Dexterity and +1 Intelligence ability scores."
             else:
-                absc = "Your Dexterity score increased by 2 and your Wisdom score increases by 1."
+                self.stats['Wisdom'] += 1
+                modifystats = "Wood Elves are lithe and cunning and receive an additional +2 dexterity and +1 Wisdom ability scores."
             age = "An Elf typically claims adulthood and an adult name around the age of 100 and can live to be 750 years old."
             size = "Elves range from under 5 to over 6 feet tall and have slender builds. Your size is Medium."
             speed = "Your base walking speed is 30 feet."
@@ -70,13 +107,16 @@ class Character(object):
                 special = "Elf Weapon Training: You have proficiency with the longsword, shortsword, shortbow, and longbow.\nCantrip: You know one cantrip of your choice from the wizard spell list.\nExtra Language: You can speak, read, and write one extra language of your choice."
             else:
                 special = "Elf Weapon Training: You have proficiency with the longsword, shortsword, shortbow, and longbow.\nFleet of Foot: Your base walking speed increases to 35 feet.\nMask of the Wild: You can attempt to hide even when you are only lightly obscured by foliage, heavy rain, falling snow, and other natural phenomena."
-            return absc, age, size, speed, language, special
+            return modifystats,age, size, speed, language, special
         #Halfling
         elif race == 'Lightfoot Halfling' or race == 'Stout Halfling':
+            self.stats['Dexterity'] += 2
             if race == 'Lightfoot Halfling':
-                absc = "Your Dexterity score increases by 2 and your Charisma score increases by 1."
+                self.stats['Charisma'] += 1
+                modifystats = "Lightfoot Halflings are lithe and charismatic receiving an additional +2 Dexterity and +1 Charisma ability scores."
             else:
-                absc = "Your Dexterity score increases by 2 and your Constitution score increases by 1."
+                self.stats['Constitution'] += 1
+                modifystats = "Stout Halfings are lithe and hardy receiving an additional +2 Dexterity and +1 Constitution ability scores."
             age = "A halfling reaches adulthood at the age of 20 and generally lives into the middle of his or her second century"
             size = "Halflings average about 3 feet tall and weigh about 40 pounds. Your size is Small."
             speed = "Your base walking speed is 25 feet."
@@ -85,26 +125,30 @@ class Character(object):
                 special = "Naturally Stealthy: You can attempt to hide even when you are obscured by a creature that is at least one size larger than you."
             else:
                 special = "Stout Resilience: You have advantage on saving throws against poison, and you have resistance against poison damage."
-            return absc, age, size, speed, language, special
+            return modifystats, age, size, speed, language, special
         #Human
         elif race == 'Human':
-            absc = "Your ability scores each increase by 1."
+            self.stats['Dexterity'] += 1
+            self.stats['Strength'] += 1
+            self.stats['Constitution'] += 1
+            self.stats['Wisdom'] += 1
+            self.stats['Intelligence'] += 1
+            self.stats['Charisma'] += 1
+            modifystats = "Humans are very resilient and receive a +1 to all ability scores."
             age = "Humans reach adulthood in their late teens and live less than a century."
             size = "Humans vary widely in height and build, from barely 5 feet to well over 6 feet tall. Your size is Medium."
             speed = "Your base walking speed is 30 feet."
             language = "You can speak, read and write Common and One extra language of your choosing. "
             special = ""
 
-            return absc, age, size, speed, language, special
+            return modifystats,age, size, speed, language, special
         else:
             return "What?"
 
     def char_spells(self):
         num0 = 3
         num1 = 2
-        cantrip_spells = []
-        level_1_spells = []
-        cantrips = ['Acid Splash',
+        cantrips = sample(['Acid Splash',
         'Dancing Lights',
         'Fire Bolt',
         'Guidance',
@@ -118,9 +162,9 @@ class Character(object):
         'Sacred Flame',
         'Shocking Grasp',
         'Spare the Dying',
-        'Thaumaturgy']
+        'Thaumaturgy'],num0)
 
-        level_1 = ['Bless',
+        level_1 = sample(['Bless',
         'Burning Hands',
         'Charm Person',
         'command',
@@ -140,66 +184,52 @@ class Character(object):
         'Shield of Faith',
         'Silent Image',
         'Sleep',
-        'Thunderwave']
-        for x in range(num0):
-            lvl0 = cantrips[randint(0,len(cantrips)-1)]
-            cantrip_spells.append(lvl0)
-            cantrips.remove(lvl0)
-
-        for y in range(num1):
-            lvl1 = level_1[randint(0,len(level_1)-1)]
-            level_1_spells.append(lvl1)
-            level_1.remove(lvl1)
-
-        return cantrip_spells, level_1_spells
+        'Thunderwave'],num1)
+        return cantrips, level_1
 
     def print_spells(self):
         #spells looks like this ([cantrip1,cantrip2],[spell1,spell2])
         #using 2 for loops for desired spelllist output
-        spells = self.spells
-        print "\tCantrips:"
+        spells = self.char_spells()
+        print "\nCantrips:"
         for x in spells[0]:
-            print "\t\t" + x
-        print "\tLevel 1:"
+            print "\t" + x
+        print "Level 1:"
         for y in spells[1]:
-            print "\t\t" + y
+            print "\t" + y
 
     def char_items(self):
-        pass
+        #gold
+        if self.characterclass == 'Cleric' or self.characterclass == 'Fighter':
+            num = 5
+        else:
+            num = 4
+        gold = 0
+        for x in range(num):
+            goldroll = randint(1,4)
+            gold += goldroll
+        gold *= 10
+        return gold
 
-    def character_info(self):
-        stat_name = ['Strength','Wisdom','Intelligence','Constitution','Dexterity','Charisma']
-        FINAL_STATS = []
-        print "\n\tYour race is {} and your class is {}\n".format(self.characterrace,self.characterclass )
-        print "Please choose one of the following for your stat: {}".format(self.stats)
-        for stat_num in range(len(self.stats)):
-            while True:
-                user = raw_input("Please input one of these stats for your " + stat_name[stat_num] + ": ")
-                if user.isdigit():
-                    stat_choice = int(user)
-                    if stat_choice in self.stats:
-                        FINAL_STATS.append(str(stat_name[stat_num]) + ": " + str(stat_choice) )
-                        self.stats.remove(stat_choice)
-                        break
 
-        print "\n\tSUMMARY"
-        print "\n\tYour class is {} and your race is {}\n".format(self.characterrace,self.characterclass)
-        print '''
-    \tCharacter Information:\n
-    Ability Score: {}
-    Language: {}
-    Size: {}
-    Speed: {}
-    Age: {}
-    {}
-     '''.format(self.traits[0], self.traits[1], self.traits[2], self.traits[3], self.traits[4], self.traits[5])
-        if self.characterclass == 'Cleric' or self.characterclass == 'Wizard':
+    def character_summary(self):
+        print "\t\tSUMMARY OF CHARACTER"
+        print "RACE & CLASS"
+        print "Your race is that of a {}\nYour class is that of a {}".format(self.characterrace, self.characterclass)
+        print "You Start with {} gold\n".format(self.items)
+        print "TRAITS"
+        for i in range (len(self.traits)):
+            print self.traits[i]
+
+        print "\nSTATS"
+        for i in self.stats:
+            print "{}:{} ".format(i,self.stats[i]),#this comma keeps it on one line, remove to make it vertical
+
+        if self.characterclass =='Cleric ' or self.characterclass == 'Wizard':
             self.print_spells()
-        print "\t\t\tYour final stats are as follows:\n\t{} {} {} {} {} {}".format(FINAL_STATS[0],FINAL_STATS[1],FINAL_STATS[2],FINAL_STATS[3],FINAL_STATS[4],FINAL_STATS[5])
 
-#character testing
 if __name__ == "__main__":
     print "Welcome to my Dungeons & Dragons character randomizer"
     first_character = Character()
     while raw_input("\nWould you like to create a character?(no to Quit)\n") !=  'no':
-        random_character = Character()
+        next_character = Character()
